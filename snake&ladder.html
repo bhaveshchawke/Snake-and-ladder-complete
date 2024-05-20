@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake and Ladders Game</title>
+    <style>
+        .board {
+            display: grid;
+            grid-template-columns: repeat(10, 90px);
+            grid-template-rows: repeat(10, 90px);
+            background-image: url('https://i.pinimg.com/564x/bf/bd/6f/bfbd6f578d80f905ea43332cb404d0d0.jpg');
+            /* background-image: url(https://wallpapers.com/images/hd/king-cobra-pictures-ihobmt70qp0hy55l.jpg); */
+            background-repeat: no-repeat;
+            background-size: contain;
+            padding: 0.5% 0%;
+        }
+        .cell {
+            /* border: 2px solid black; */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .player {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid black;
+        }
+        .king {
+            background-color: rgb(8, 8, 7);
+        }
+        .op {
+            background-color: rgb(246, 238, 238);
+        }
+    </style>
+</head>
+<body>
+    <button class="button" onclick="rollDice()">Roll Dice</button>
+    <div class="board" id="board"></div>
+    <audio id="dice-sound" src="dice-sound.mp3"></audio>
+   
+    <script>
+        // Creating a board with zig-zag pattern starting from the bottom left
+        const board = document.getElementById("board");
+        let cells = [];
+        for (let i = 0; i < 100; i++) {
+            let cell = document.createElement("div");
+            cell.className = "cell";
+            cells.push(cell);
+        }
+
+        for (let row = 9; row >= 0; row--) { // Start from the last row
+            let start = row * 10;
+            let end = start + 10;
+            let rowCells = cells.slice(start, end);
+            if ((row) % 2 === 1) { // Reverse row cells for odd rows in the zig-zag pattern
+                rowCells.reverse();
+            }
+            rowCells.forEach((cell, idx) => {
+                cell.textContent = start + idx + 1;
+                cell.id = `cell-${start + idx + 1}`;
+                board.appendChild(cell);
+            });
+        }
+
+        // Defining snakes and ladders
+        const snandld = {
+            3: 44,
+            32: 7,
+            58: 9,
+            10: 29,
+            11: 31,
+            59: 25,
+            28: 50,
+            37: 75,
+            63: 42,
+            43: 84,
+            70: 44,
+            89: 46,
+            61: 94,
+            92: 76,
+            87: 96,
+        };
+
+        // Player positions
+        let positionOfKing = 1;
+        let positionOfOPT = 1;
+        let currentPlayer = 1;
+
+        // Function to move a player
+        function move(player, step) {
+            let position;
+            if (player === 1) {
+                position = positionOfKing;
+            } else {
+                position = positionOfOPT;
+            }
+
+            // Calculating new position
+            let newPosition = position + step;
+            if (newPosition > 100) {
+                newPosition = 100 - (newPosition - 100);
+            }
+
+            // Checking for snakes and ladders
+            if (snandld[newPosition]) {
+                newPosition = snandld[newPosition];
+            }
+
+            // Clearing the previous position
+            document.getElementById(`cell-${position}`).innerHTML = position;
+
+            // Updating the position of a player
+            if (player === 1) {
+                positionOfKing = newPosition;
+                if(positionOfKing > 100){
+                    positionOfKing = position
+                }
+                document.getElementById(`cell-${newPosition}`).innerHTML += '<div class="player king"></div>';
+            } else {
+                positionOfOPT = newPosition;
+                if(positionOfOPT > 100){
+                    positionOfOPT = position
+                }
+                document.getElementById(`cell-${newPosition}`).innerHTML += '<div class="player op"></div>';
+            }
+        }
+
+        // Move a player by rolling a dice
+        function rollDice() {
+            const steps = Math.floor(Math.random() * 6) + 1;
+            
+            // Play dice sound
+            const diceSound = document.getElementById("dice-sound");
+            diceSound.play();
+            
+            move(currentPlayer, steps);
+
+            // Change player after moving
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+
+            if(positionOfKing >= 100 ){
+                alert("YELLOW WON THE MATCH>>>>>3")
+            }
+            else if (positionOfOPT >= 100){
+                alert("RED WON THE MATCH>>>>>>>3")
+            }
+        }
+
+        // Initial player positions
+        move(1, 0);
+        move(2, 0);
+    </script>
+</body>
+</html>
