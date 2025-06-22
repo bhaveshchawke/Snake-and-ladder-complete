@@ -1,2 +1,2 @@
 # Snack ladder
-i am a snake ladder game
+i am a new feature in a game
